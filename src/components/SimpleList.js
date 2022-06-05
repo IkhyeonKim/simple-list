@@ -38,6 +38,11 @@ const SimpleList = ({ itemList }) => {
       if (e?.path && e.path.length > 0) {
         for (let i = 0; i < e.path.length; i++) {
           const element = e.path[i];
+
+          if (element.classList.contains("list")) {
+            break;
+          }
+
           if (element.classList.contains("list-wrapper")) {
             setIsListVisible((v) => !v);
             break;
