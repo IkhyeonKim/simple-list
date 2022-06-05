@@ -28,10 +28,9 @@ const ListWrapper = styled.div`
   }
 `;
 
-const SimpleListPresenter = ({ renderList, isListVisible }) => {
-  console.log(isListVisible);
+const SimpleListPresenter = ({ renderList, isListVisible, refListEl }) => {
   return (
-    <ListWrapper>
+    <ListWrapper className="list-wrapper" ref={refListEl}>
       <div className="list-selector">
         <ArrowIcon />
       </div>

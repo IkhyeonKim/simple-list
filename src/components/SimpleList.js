@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SimpleListPresenter from "./SimpleList.presenter";
 
 /*
@@ -15,6 +15,7 @@ import SimpleListPresenter from "./SimpleList.presenter";
 const SimpleList = ({ itemList }) => {
   const [_list, setList] = useState([]);
   const [isListVisible, setIsListVisible] = useState(false);
+  const refListEl = useRef();
 
   useEffect(() => {
     if (Array.isArray(itemList)) {
@@ -32,7 +33,24 @@ const SimpleList = ({ itemList }) => {
     }
   }, [itemList]);
 
-  return <SimpleListPresenter renderList={_list} isListVisible={isListVisible} />;
+  useEffect(() => {
+    const onClick = (e) => {
+      if (e?.path && e.path.length > 0) {
+        for (let i = 0; i < e.path.length; i++) {
+          const element = e.path[i];
+          if (element.classList.contains("list-wrapper")) {
+            setIsListVisible((v) => !v);
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener("click", onClick);
+
+    return () => window.removeEventListener("click", onClick);
+  }, []);
+
+  return <SimpleListPresenter renderList={_list} isListVisible={isListVisible} refListEl={refListEl} />;
 };
 
 export default SimpleList;
