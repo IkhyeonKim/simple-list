@@ -7,6 +7,7 @@ const arr2 = [
   { key: 2, value: "BBB" },
   { key: 3, value: "CCC" },
   { key: 4, value: "DDD" },
+  { key: 5, value: "EEE" },
 ];
 
 function App() {
