@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useOnClickOutside } from "./Clickoutside";
 import SimpleListPresenter from "./SimpleList.presenter";
 
 /*
@@ -8,7 +9,7 @@ import SimpleListPresenter from "./SimpleList.presenter";
   2. Basic logic
     - Default value
     - Return selected list
-    - 
+    - Click outside
 
 */
 
@@ -16,6 +17,8 @@ const SimpleList = ({ itemList }) => {
   const [_list, setList] = useState([]);
   const [isListVisible, setIsListVisible] = useState(false);
   const refListEl = useRef();
+
+  useOnClickOutside(refListEl, () => setIsListVisible(false));
 
   useEffect(() => {
     if (Array.isArray(itemList)) {
@@ -38,7 +41,9 @@ const SimpleList = ({ itemList }) => {
       if (e?.path && e.path.length > 0) {
         for (let i = 0; i < e.path.length; i++) {
           const element = e.path[i];
-
+          // TODO: think about better way to find the element
+          if (!element) return;
+          if (element.classList === undefined) return;
           if (element.classList.contains("list")) {
             break;
           }
