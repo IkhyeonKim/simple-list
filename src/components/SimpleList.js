@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "./Clickoutside";
 import SimpleListPresenter from "./SimpleList.presenter";
 
@@ -15,6 +15,7 @@ import SimpleListPresenter from "./SimpleList.presenter";
 
 const SimpleList = ({ itemList }) => {
   const [_list, setList] = useState([]);
+  const [selectedList, setSelectedList] = useState([]);
   const [isListVisible, setIsListVisible] = useState(false);
   const refListEl = useRef();
 
@@ -35,6 +36,19 @@ const SimpleList = ({ itemList }) => {
       setList([...temp]);
     }
   }, [itemList]);
+
+  const onChangeCheckboxItem = useCallback(
+    ({ event, checkedItem }) => {
+      let checked = event.target.checked;
+      console.log({ event, checkedItem, checked });
+      const targetItem = _list.find((listItem) => listItem.key === checkedItem.key);
+
+      if (targetItem) {
+        targetItem = { ...targetItem, checked };
+      }
+    },
+    [_list]
+  );
 
   useEffect(() => {
     const onClick = (e) => {
@@ -60,7 +74,14 @@ const SimpleList = ({ itemList }) => {
     return () => window.removeEventListener("click", onClick);
   }, []);
 
-  return <SimpleListPresenter renderList={_list} isListVisible={isListVisible} refListEl={refListEl} />;
+  return (
+    <SimpleListPresenter
+      renderList={_list}
+      isListVisible={isListVisible}
+      refListEl={refListEl}
+      onChangeCheckboxItem={onChangeCheckboxItem}
+    />
+  );
 };
 
 export default SimpleList;

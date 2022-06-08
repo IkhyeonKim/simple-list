@@ -28,7 +28,7 @@ const ListWrapper = styled.div`
   }
 `;
 
-const SimpleListPresenter = ({ renderList, isListVisible, refListEl }) => {
+const SimpleListPresenter = ({ renderList, isListVisible, refListEl, onChangeCheckboxItem }) => {
   return (
     <ListWrapper className="list-wrapper" ref={refListEl}>
       <div className="list-selector">
@@ -39,7 +39,12 @@ const SimpleListPresenter = ({ renderList, isListVisible, refListEl }) => {
           {renderList.map((item) => {
             return (
               <li key={item.key} className="list-item">
-                <input type="checkbox" id={item.key} name={item.key} onChange={() => {}} />
+                <input
+                  type="checkbox"
+                  id={item.key}
+                  name={item.key}
+                  onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
+                />
                 <label htmlFor={item.key}>{item.value}</label>
               </li>
             );
