@@ -6,11 +6,13 @@ import SimpleListPresenter from "./SimpleList.presenter";
   TODO: 
   1. Basic style
     - visible
+    - Clickable area
   2. Basic logic
     - Default value
     - Return selected list
     - Click outside
-
+  3. Issues
+    - Can't open on Safari broswer
 */
 
 const SimpleList = ({ itemList, onItemSelected }) => {
@@ -116,10 +118,11 @@ const SimpleList = ({ itemList, onItemSelected }) => {
 
   return (
     <SimpleListPresenter
-      renderList={_list}
+      itemList={_list}
       isListVisible={isListVisible}
       refListEl={refListEl}
       onChangeCheckboxItem={onChangeCheckboxItem}
+      selectedList={refSelectedList.current}
     />
   );
 };
