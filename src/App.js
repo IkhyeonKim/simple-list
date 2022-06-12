@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import SimpleList from "./components/SimpleList";
 
 const arr = ["aaa", "bbb", "ccc", "ddd", "eee", "fff"];
@@ -11,9 +11,15 @@ const arr2 = [
 ];
 
 function App() {
+  const [myList, setMyList] = useState([]);
   return (
     <div style={{ padding: "1rem" }}>
-      <SimpleList itemList={arr2} />
+      <SimpleList itemList={arr2} onItemSelected={(list) => setMyList(list)} />
+      <ul>
+        {myList.map((item) => (
+          <li key={item.key}>{item.value}</li>
+        ))}
+      </ul>
     </div>
   );
 }

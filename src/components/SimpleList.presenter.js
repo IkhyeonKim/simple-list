@@ -43,6 +43,7 @@ const SimpleListPresenter = ({ renderList, isListVisible, refListEl, onChangeChe
                   type="checkbox"
                   id={item.key}
                   name={item.key}
+                  checked={item.checked}
                   onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
                 />
                 <label htmlFor={item.key}>{item.value}</label>
