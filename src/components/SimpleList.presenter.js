@@ -50,14 +50,15 @@ const ListWrapper = styled.div`
   }
 
   li.list-item {
+    position: relative;
     list-style: none;
     height: 30px;
     display: flex;
     align-items: center;
-    padding-left: 12px;
 
     & > input {
-      margin-right: 4px;
+      position: absolute;
+      left: 12px;
       cursor: pointer;
     }
 
@@ -66,6 +67,7 @@ const ListWrapper = styled.div`
       align-items: center;
       width: 100%;
       height: 100%;
+      padding-left: 30px;
       cursor: pointer;
     }
     &:hover,

@@ -6,13 +6,15 @@ import SimpleListPresenter from "./SimpleList.presenter";
   TODO: 
   1. Basic style
     - visible
-    - Clickable area
+    - selector area 
   2. Basic logic
     - Default value
     - Return selected list
     - Click outside
+    - Filtering
   3. Issues
     - Can't open on Safari broswer
+    - Clickable area add onClick event to li elment
 */
 
 const SimpleList = ({ itemList, onItemSelected }) => {
