@@ -41,11 +41,21 @@ const ListWrapper = styled.div`
     }
   }
 
+  .list-selector-filter {
+    & > input {
+      width: 100%;
+      margin-top: 4px;
+      padding: 8px;
+      border: 1px solid #d9d9d9;
+    }
+  }
+
   ul.list {
     width: 100%;
     /* padding: 12px; */
     margin-top: 2px;
     border: 1px solid #d9d9d9;
+    border-top: none;
     border-radius: 2px;
   }
 
@@ -96,15 +106,30 @@ const SimpleListPresenter = ({
   refListEl,
   onChangeCheckboxItem,
   selectedList,
+  filterTxt,
+  setFilterTxt,
 }) => {
+  console.log("SimpleListPresenter");
   useEffect(() => {
     console.log("Presenter", { selectedList });
   }, [selectedList]);
   return (
     <ListWrapper className="list-wrapper" ref={refListEl}>
-      <div className={`${isListVisible ? "list-selector list-selector-focused" : "list-selector"}`}>
-        {isArrayItemExists(selectedList) && renderSelector(selectedList)}
-        <ArrowIcon />
+      <div className="list-selector-wrapper">
+        <div
+          className={`${isListVisible ? "list-selector list-selector-focused" : "list-selector"}`}
+        >
+          {isArrayItemExists(selectedList) && renderSelector(selectedList)} <ArrowIcon />
+        </div>
+        <div className="list-selector-filter">
+          {isListVisible && (
+            <input
+              value={filterTxt}
+              onChange={(e) => setFilterTxt(e.target.value)}
+              placeholder="Search Filter"
+            />
+          )}
+        </div>
       </div>
       {isListVisible && (
         <ul className="list">

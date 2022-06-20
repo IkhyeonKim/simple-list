@@ -12,15 +12,18 @@ import SimpleListPresenter from "./SimpleList.presenter";
     - Return selected list
     - Click outside
     - Filtering
+    - Check all
   3. Issues
     - Can't open on Safari broswer
-    - Clickable area add onClick event to li elment
+    - Think about reducing rendering when filter changes...
+      -> Should I split the component?
 */
 
 const SimpleList = ({ itemList, onItemSelected }) => {
   const [_list, setList] = useState([]);
   const [selectedList, setSelectedList] = useState([]);
   const [isListVisible, setIsListVisible] = useState(false);
+  const [filterTxt, setFilterTxt] = useState("");
   const refListEl = useRef();
   const refSelectedList = useRef([]);
 
@@ -98,9 +101,8 @@ const SimpleList = ({ itemList, onItemSelected }) => {
           // TODO: think about better way to find the element
           if (!element) return;
           if (element.classList === undefined) return;
-          if (element.classList.contains("list")) {
-            break;
-          }
+          if (element.classList.contains("list")) break;
+          if (element.classList.contains("list-selector-filter")) break;
 
           if (element.classList.contains("list-wrapper")) {
             setIsListVisible((v) => !v);
@@ -118,6 +120,8 @@ const SimpleList = ({ itemList, onItemSelected }) => {
     console.log("!!!!!", _list);
   }, [_list]);
 
+  console.log("SimpleList");
+
   return (
     <SimpleListPresenter
       itemList={_list}
@@ -125,6 +129,8 @@ const SimpleList = ({ itemList, onItemSelected }) => {
       refListEl={refListEl}
       onChangeCheckboxItem={onChangeCheckboxItem}
       selectedList={refSelectedList.current}
+      filterTxt={filterTxt}
+      setFilterTxt={setFilterTxt}
     />
   );
 };
