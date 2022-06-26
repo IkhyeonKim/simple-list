@@ -22,6 +22,7 @@ import SimpleListPresenter from "./SimpleList.presenter";
 const SimpleList = ({ itemList, onItemSelected }) => {
   const [_list, setList] = useState([]);
   const [selectedList, setSelectedList] = useState([]);
+  const [isAllchecked, setIsAllChecked] = useState([]);
   const [isListVisible, setIsListVisible] = useState(false);
   const [filterTxt, setFilterTxt] = useState("");
   const refListEl = useRef();
@@ -103,6 +104,7 @@ const SimpleList = ({ itemList, onItemSelected }) => {
           if (element.classList === undefined) return;
           if (element.classList.contains("list")) break;
           if (element.classList.contains("list-selector-filter")) break;
+          if (element.classList.contains("list-selector-allcheck")) break;
 
           if (element.classList.contains("list-wrapper")) {
             setIsListVisible((v) => !v);
@@ -131,6 +133,8 @@ const SimpleList = ({ itemList, onItemSelected }) => {
       selectedList={refSelectedList.current}
       filterTxt={filterTxt}
       setFilterTxt={setFilterTxt}
+      isAllchecked={isAllchecked}
+      setIsAllChecked={setIsAllChecked}
     />
   );
 };

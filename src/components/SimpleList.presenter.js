@@ -41,10 +41,13 @@ const ListWrapper = styled.div`
     }
   }
 
+  .list-selector-allcheck {
+  }
+
   .list-selector-filter {
     & > input {
       width: 100%;
-      margin-top: 4px;
+      margin-top: -1px;
       padding: 8px;
       border: 1px solid #d9d9d9;
     }
@@ -55,7 +58,6 @@ const ListWrapper = styled.div`
     /* padding: 12px; */
     margin-top: 2px;
     border: 1px solid #d9d9d9;
-    border-top: none;
     border-radius: 2px;
   }
 
@@ -108,6 +110,8 @@ const SimpleListPresenter = ({
   selectedList,
   filterTxt,
   setFilterTxt,
+  isAllChecked,
+  setIsAllChecked,
 }) => {
   console.log("SimpleListPresenter");
   useEffect(() => {
@@ -120,6 +124,22 @@ const SimpleListPresenter = ({
           className={`${isListVisible ? "list-selector list-selector-focused" : "list-selector"}`}
         >
           {isArrayItemExists(selectedList) && renderSelector(selectedList)} <ArrowIcon />
+        </div>
+        <div className="list-selector-allcheck">
+          {isListVisible && (
+            <ul className="list">
+              <li className="list-item">
+                <input
+                  type="checkbox"
+                  id={"allCheck"}
+                  name={"allCheck"}
+                  checked={isAllChecked}
+                  onChange={(event) => setIsAllChecked(event.target.checked)}
+                />
+                <label htmlFor={"allCheck"}>ALL</label>
+              </li>
+            </ul>
+          )}
         </div>
         <div className="list-selector-filter">
           {isListVisible && (
