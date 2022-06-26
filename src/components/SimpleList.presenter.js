@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import ArrowIcon from "./ArrowIcon";
 
@@ -108,6 +108,7 @@ const SimpleListPresenter = ({
   refListEl,
   onChangeCheckboxItem,
   selectedList,
+  filteredList,
   filterTxt,
   setFilterTxt,
   isAllChecked,
@@ -117,6 +118,40 @@ const SimpleListPresenter = ({
   useEffect(() => {
     console.log("Presenter", { selectedList });
   }, [selectedList]);
+
+  const renderItemList = useCallback(() => {
+    return itemList.map((item) => {
+      return (
+        <li key={item.key} className="list-item">
+          <input
+            type="checkbox"
+            id={item.key}
+            name={item.key}
+            checked={item.checked}
+            onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
+          />
+          <label htmlFor={item.key}>{item.value}</label>
+        </li>
+      );
+    });
+  }, [itemList, onChangeCheckboxItem]);
+
+  const renderFilteredItemList = useCallback(() => {
+    return filteredList.map((item) => {
+      return (
+        <li key={item.key} className="list-item">
+          <input
+            type="checkbox"
+            id={item.key}
+            name={item.key}
+            checked={item.checked}
+            onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
+          />
+          <label htmlFor={item.key}>{item.value}</label>
+        </li>
+      );
+    });
+  }, [filteredList, onChangeCheckboxItem]);
   return (
     <ListWrapper className="list-wrapper" ref={refListEl}>
       <div className="list-selector-wrapper">
@@ -155,22 +190,7 @@ const SimpleListPresenter = ({
         </div>
       </div>
       {isListVisible && (
-        <ul className="list">
-          {itemList.map((item) => {
-            return (
-              <li key={item.key} className="list-item">
-                <input
-                  type="checkbox"
-                  id={item.key}
-                  name={item.key}
-                  checked={item.checked}
-                  onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
-                />
-                <label htmlFor={item.key}>{item.value}</label>
-              </li>
-            );
-          })}
-        </ul>
+        <ul className="list">{filterTxt ? renderFilteredItemList() : renderItemList()}</ul>
       )}
     </ListWrapper>
   );

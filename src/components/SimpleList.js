@@ -21,6 +21,7 @@ import SimpleListPresenter from "./SimpleList.presenter";
 
 const SimpleList = ({ itemList, onItemSelected }) => {
   const [_list, setList] = useState([]);
+  const [filteredList, setFilteredList] = useState([]);
   const [selectedList, setSelectedList] = useState([]);
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [isListVisible, setIsListVisible] = useState(false);
@@ -90,6 +91,15 @@ const SimpleList = ({ itemList, onItemSelected }) => {
         });
         setList(temp);
 
+        //TODO: Is this the best..?
+        if (filterTxt) {
+          const temp = filteredList.map((item) => {
+            if (targetItem.key === item.key) return targetItem;
+            return { ...item };
+          });
+          setFilteredList(temp);
+        }
+
         if (checked) {
           addToSelectedList(targetItem);
         } else {
@@ -99,7 +109,7 @@ const SimpleList = ({ itemList, onItemSelected }) => {
         returnSelectedList();
       }
     },
-    [_list, addToSelectedList, removeFromSelectedList, returnSelectedList]
+    [_list, addToSelectedList, filterTxt, filteredList, removeFromSelectedList, returnSelectedList]
   );
 
   const onChangeAllChecked = useCallback(
@@ -119,6 +129,23 @@ const SimpleList = ({ itemList, onItemSelected }) => {
       setList(tempArr);
     },
     [_list, addAllSelectedList, addToSelectedList, removeAllSelectedList, returnSelectedList]
+  );
+
+  const onChangeFilter = useCallback(
+    (value) => {
+      console.log({ filterTextValue: value });
+      setFilterTxt(value);
+      if (value) {
+        const tempArr = _list.filter((item) =>
+          item.value.toLowerCase().includes(value.toLowerCase())
+        );
+        console.log({ tempArr });
+        setFilteredList(tempArr);
+      } else {
+        setFilteredList([]);
+      }
+    },
+    [_list]
   );
 
   useEffect(() => {
@@ -159,9 +186,10 @@ const SimpleList = ({ itemList, onItemSelected }) => {
       onChangeCheckboxItem={onChangeCheckboxItem}
       selectedList={refSelectedList.current}
       filterTxt={filterTxt}
-      setFilterTxt={setFilterTxt}
+      setFilterTxt={onChangeFilter}
       isAllChecked={isAllChecked}
       setIsAllChecked={onChangeAllChecked}
+      filteredList={filteredList}
     />
   );
 };
