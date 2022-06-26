@@ -22,7 +22,7 @@ import SimpleListPresenter from "./SimpleList.presenter";
 const SimpleList = ({ itemList, onItemSelected }) => {
   const [_list, setList] = useState([]);
   const [selectedList, setSelectedList] = useState([]);
-  const [isAllchecked, setIsAllChecked] = useState([]);
+  const [isAllChecked, setIsAllChecked] = useState(false);
   const [isListVisible, setIsListVisible] = useState(false);
   const [filterTxt, setFilterTxt] = useState("");
   const refListEl = useRef();
@@ -51,6 +51,10 @@ const SimpleList = ({ itemList, onItemSelected }) => {
     }
   }, [itemList]);
 
+  const addAllSelectedList = useCallback((items) => {
+    refSelectedList.current = [...items];
+  }, []);
+
   const addToSelectedList = useCallback((item) => {
     refSelectedList.current.push(item);
   }, []);
@@ -60,6 +64,10 @@ const SimpleList = ({ itemList, onItemSelected }) => {
       (selectedItem) => selectedItem.key !== item.key
     );
     refSelectedList.current = _selectedList;
+  }, []);
+
+  const removeAllSelectedList = useCallback(() => {
+    refSelectedList.current = [];
   }, []);
 
   const returnSelectedList = useCallback(() => {
@@ -92,6 +100,25 @@ const SimpleList = ({ itemList, onItemSelected }) => {
       }
     },
     [_list, addToSelectedList, removeFromSelectedList, returnSelectedList]
+  );
+
+  const onChangeAllChecked = useCallback(
+    (checked) => {
+      setIsAllChecked(checked);
+
+      const tempArr = _list.map((item) => {
+        addToSelectedList();
+        return { ...item, checked };
+      });
+      if (checked) {
+        addAllSelectedList(tempArr);
+      } else {
+        removeAllSelectedList();
+      }
+      returnSelectedList();
+      setList(tempArr);
+    },
+    [_list, addAllSelectedList, addToSelectedList, removeAllSelectedList, returnSelectedList]
   );
 
   useEffect(() => {
@@ -133,8 +160,8 @@ const SimpleList = ({ itemList, onItemSelected }) => {
       selectedList={refSelectedList.current}
       filterTxt={filterTxt}
       setFilterTxt={setFilterTxt}
-      isAllchecked={isAllchecked}
-      setIsAllChecked={setIsAllChecked}
+      isAllChecked={isAllChecked}
+      setIsAllChecked={onChangeAllChecked}
     />
   );
 };

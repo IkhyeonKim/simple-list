@@ -113,7 +113,7 @@ const SimpleListPresenter = ({
   isAllChecked,
   setIsAllChecked,
 }) => {
-  console.log("SimpleListPresenter");
+  console.log("SimpleListPresenter", { isAllChecked, isListVisible });
   useEffect(() => {
     console.log("Presenter", { selectedList });
   }, [selectedList]);
@@ -134,7 +134,10 @@ const SimpleListPresenter = ({
                   id={"allCheck"}
                   name={"allCheck"}
                   checked={isAllChecked}
-                  onChange={(event) => setIsAllChecked(event.target.checked)}
+                  onChange={(event) => {
+                    console.log(event.target.checked);
+                    setIsAllChecked(event.target.checked);
+                  }}
                 />
                 <label htmlFor={"allCheck"}>ALL</label>
               </li>
