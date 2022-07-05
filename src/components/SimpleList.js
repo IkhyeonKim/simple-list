@@ -6,12 +6,15 @@ import SimpleListPresenter from "./SimpleList.presenter";
   TODO: 
   1. Basic style
     - visible
-    - selector area 
+    - selector area count
+    - selector area item names
+    - checkbox indeterminate position
   2. Basic logic
     - Default value
     - Return selected list
     - Click outside
     - Filtering
+    - Check all filtering
     - Check all
   3. Issues
     - Can't open on Safari broswer
@@ -116,19 +119,28 @@ const SimpleList = ({ itemList, onItemSelected }) => {
     (checked) => {
       setIsAllChecked(checked);
 
-      const tempArr = _list.map((item) => {
-        addToSelectedList();
-        return { ...item, checked };
-      });
+      let tempArr = [];
+
+      if (filterTxt) {
+        tempArr = filteredList.map((item) => {
+          return { ...item, checked };
+        });
+        setFilteredList(tempArr);
+      } else {
+        tempArr = _list.map((item) => {
+          return { ...item, checked };
+        });
+        setList(tempArr);
+      }
+
       if (checked) {
         addAllSelectedList(tempArr);
       } else {
         removeAllSelectedList();
       }
       returnSelectedList();
-      setList(tempArr);
     },
-    [_list, addAllSelectedList, addToSelectedList, removeAllSelectedList, returnSelectedList]
+    [_list, addAllSelectedList, filterTxt, filteredList, removeAllSelectedList, returnSelectedList]
   );
 
   const onChangeFilter = useCallback(
