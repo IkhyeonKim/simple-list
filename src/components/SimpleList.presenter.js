@@ -68,20 +68,69 @@ const ListWrapper = styled.div`
     display: flex;
     align-items: center;
 
-    & > input {
+    label {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      padding-left: 20px;
+      position: relative;
+      cursor: pointer;
+
+      .checkbox-inner {
+        position: relative;
+        top: 0;
+        left: -8px;
+        display: block;
+        width: 16px;
+        height: 16px;
+        direction: ltr;
+        background-color: #fff;
+        border: 1px solid #d9d9d9;
+        border-radius: 2px;
+        border-collapse: separate;
+        transition: all 0.3s;
+
+        &:after {
+          position: absolute;
+          top: 50%;
+          left: 27.5%;
+          display: table;
+          width: 3.714286px;
+          height: 6.142857px;
+          border: 2px solid #fff;
+          border-top: 0;
+          border-left: 0;
+          transform: rotate(45deg) scale(0) translate(-50%, -50%);
+          opacity: 0;
+          transition: all 0.1s cubic-bezier(0.71, -0.46, 0.88, 0.6), opacity 0.1s;
+          content: " ";
+        }
+
+        &.checked {
+          background-color: #00b4d8;
+          border: none;
+          &:after {
+            position: absolute;
+            display: table;
+            border: 2px solid #fff;
+            border-top: 0;
+            border-left: 0;
+            transform: rotate(45deg) scale(1) translate(-50%, -50%);
+            opacity: 1;
+            transition: all 0.2s cubic-bezier(0.12, 0.4, 0.29, 1.46) 0.1s;
+            content: " ";
+          }
+        }
+      }
+    }
+
+    input {
       position: absolute;
       left: 12px;
       cursor: pointer;
     }
 
-    & > label {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      height: 100%;
-      padding-left: 30px;
-      cursor: pointer;
-    }
     &:hover,
     &:focus {
       background-color: #e9fafd;
@@ -123,14 +172,18 @@ const SimpleListPresenter = ({
     return itemList.map((item) => {
       return (
         <li key={item.key} className="list-item">
-          <input
-            type="checkbox"
-            id={item.key}
-            name={item.key}
-            checked={item.checked}
-            onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
-          />
-          <label htmlFor={item.key}>{item.value}</label>
+          <label htmlFor={item.key}>
+            <input
+              style={{ display: "none" }}
+              type="checkbox"
+              id={item.key}
+              name={item.key}
+              checked={item.checked}
+              onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
+            />
+            <span className={`checkbox-inner ${item.checked ? "checked" : ""}`}></span>
+            <span>{item.value}</span>
+          </label>
         </li>
       );
     });
@@ -140,14 +193,17 @@ const SimpleListPresenter = ({
     return filteredList.map((item) => {
       return (
         <li key={item.key} className="list-item">
-          <input
-            type="checkbox"
-            id={item.key}
-            name={item.key}
-            checked={item.checked}
-            onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
-          />
-          <label htmlFor={item.key}>{item.value}</label>
+          <label htmlFor={item.key}>
+            <input
+              style={{ display: "none" }}
+              type="checkbox"
+              id={item.key}
+              name={item.key}
+              checked={item.checked}
+              onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
+            />
+            {item.value}
+          </label>
         </li>
       );
     });
