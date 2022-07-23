@@ -20,6 +20,9 @@ import SimpleListPresenter from "./SimpleList.presenter";
     - Can't open on Safari broswer
     - Think about reducing rendering when filter changes...
       -> Should I split the component?
+  Today: 
+  Make checkbox as a component
+  Add indetermine style
 */
 
 const SimpleList = ({ itemList, onItemSelected }) => {
@@ -27,6 +30,7 @@ const SimpleList = ({ itemList, onItemSelected }) => {
   const [filteredList, setFilteredList] = useState([]);
   const [selectedList, setSelectedList] = useState([]);
   const [isAllChecked, setIsAllChecked] = useState(false);
+  const [isIndeterminate, setIsIndeterminate] = useState(false);
   const [isListVisible, setIsListVisible] = useState(false);
   const [filterTxt, setFilterTxt] = useState("");
   const refListEl = useRef();
@@ -109,6 +113,18 @@ const SimpleList = ({ itemList, onItemSelected }) => {
           removeFromSelectedList(targetItem);
         }
 
+        // Check is Allcheck
+        if (refSelectedList.current.length === 0) {
+          setIsAllChecked(false);
+          setIsIndeterminate(false);
+        } else if (refSelectedList.current.length === _list.length) {
+          setIsAllChecked(true);
+          setIsIndeterminate(false);
+        } else {
+          setIsAllChecked(false);
+          setIsIndeterminate(true);
+        }
+
         returnSelectedList();
       }
     },
@@ -118,6 +134,7 @@ const SimpleList = ({ itemList, onItemSelected }) => {
   const onChangeAllChecked = useCallback(
     (checked) => {
       setIsAllChecked(checked);
+      setIsIndeterminate(false);
 
       let tempArr = [];
 
@@ -202,6 +219,7 @@ const SimpleList = ({ itemList, onItemSelected }) => {
       isAllChecked={isAllChecked}
       setIsAllChecked={onChangeAllChecked}
       filteredList={filteredList}
+      isIndeterminate={isIndeterminate}
     />
   );
 };

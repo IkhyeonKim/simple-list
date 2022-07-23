@@ -100,6 +100,7 @@ const SimpleListPresenter = ({
   setFilterTxt,
   isAllChecked,
   setIsAllChecked,
+  isIndeterminate,
 }) => {
   console.log("SimpleListPresenter", { isAllChecked, isListVisible });
   useEffect(() => {
@@ -135,6 +136,7 @@ const SimpleListPresenter = ({
       );
     });
   }, [filteredList, onChangeCheckboxItem]);
+
   return (
     <ListWrapper className="list-wrapper" ref={refListEl}>
       <div className="list-selector-wrapper">
@@ -149,6 +151,7 @@ const SimpleListPresenter = ({
               <li className="list-item">
                 <Checkbox
                   checked={isAllChecked}
+                  indeterminate={isIndeterminate}
                   onChange={(event) => setIsAllChecked(event.target.checked)}
                 >
                   ALL

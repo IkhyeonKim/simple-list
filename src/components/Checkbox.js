@@ -55,6 +55,22 @@ const CheckboxStyle = styled.label`
         content: " ";
       }
     }
+
+    &.indeterminate {
+      background-color: #00b4d8;
+      border: none;
+      &:after {
+        top: 50%;
+        left: 50%;
+        width: 10px;
+        height: 2px;
+        background-color: white;
+        border: 0;
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        content: " ";
+      }
+    }
   }
 
   input {
@@ -64,7 +80,7 @@ const CheckboxStyle = styled.label`
   }
 `;
 
-const Checkbox = ({ onChange, checked, children }) => {
+const Checkbox = ({ onChange, checked, children, indeterminate }) => {
   return (
     <CheckboxStyle>
       <input
@@ -75,7 +91,9 @@ const Checkbox = ({ onChange, checked, children }) => {
           onChange(event);
         }}
       />
-      <span className={`checkbox-inner ${checked ? "checked" : ""}`}></span>
+      <span
+        className={`checkbox-inner ${indeterminate ? "indeterminate" : checked ? "checked" : ""}`}
+      ></span>
       <span>{children}</span>
     </CheckboxStyle>
   );
