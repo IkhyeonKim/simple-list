@@ -6,14 +6,14 @@ const CheckboxStyle = styled.label`
   align-items: center;
   width: 100%;
   height: 100%;
-  padding-left: 20px;
+  padding-left: 12px;
   position: relative;
   cursor: pointer;
 
   .checkbox-inner {
     position: relative;
     top: 0;
-    left: -8px;
+    left: 0;
     display: block;
     width: 16px;
     height: 16px;
@@ -23,6 +23,7 @@ const CheckboxStyle = styled.label`
     border-radius: 2px;
     border-collapse: separate;
     transition: all 0.3s;
+    margin-right: 8px;
 
     &:after {
       position: absolute;

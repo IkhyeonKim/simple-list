@@ -8,21 +8,17 @@ import SimpleListPresenter from "./SimpleList.presenter";
     - visible
     - selector area count
     - selector area item names
-    - checkbox indeterminate position
   2. Basic logic
-    - Default value
-    - Return selected list
-    - Click outside
-    - Filtering
-    - Check all filtering
-    - Check all
+
   3. Issues
     - Can't open on Safari broswer
+    - What if the item names are so long?
     - Think about reducing rendering when filter changes...
       -> Should I split the component?
   Today: 
-  Make checkbox as a component
-  Add indetermine style
+  Virtual scrolloing
+  - change css style
+  - add scroll event
 */
 
 const SimpleList = ({ itemList, onItemSelected }) => {
@@ -200,12 +196,6 @@ const SimpleList = ({ itemList, onItemSelected }) => {
 
     return () => window.removeEventListener("click", onClick);
   }, []);
-
-  useEffect(() => {
-    console.log("!!!!!", _list);
-  }, [_list]);
-
-  console.log("SimpleList");
 
   return (
     <SimpleListPresenter

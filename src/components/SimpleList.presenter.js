@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect } from "react";
+import { useState } from "react";
+import { useRef } from "react";
 import styled from "styled-components";
 import ArrowIcon from "./ArrowIcon";
 import Checkbox from "./Checkbox";
@@ -12,6 +14,9 @@ ade8f4
 The lightest blue: #e9fafd
 */
 
+const ITEM_HEIGHT = 30;
+const MAX_ITEM_CNT = 12;
+
 const ListWrapper = styled.div`
   width: 200px;
   /* height: 30px; */
@@ -24,6 +29,7 @@ const ListWrapper = styled.div`
 
   .list-selector {
     height: 30px;
+    /* height: ${ITEM_HEIGHT}px; */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -43,6 +49,15 @@ const ListWrapper = styled.div`
   }
 
   .list-selector-allcheck {
+    .selector-list {
+      width: 100%;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      line-height: 1;
+    }
+    .list-item {
+      position: relative;
+    }
   }
 
   .list-selector-filter {
@@ -54,20 +69,12 @@ const ListWrapper = styled.div`
     }
   }
 
-  ul.list {
-    width: 100%;
-    /* padding: 12px; */
-    margin-top: 2px;
-    border: 1px solid #d9d9d9;
-    border-radius: 2px;
-  }
-
-  li.list-item {
-    position: relative;
-    list-style: none;
-    height: 30px;
+  .list-item {
     display: flex;
     align-items: center;
+    width: 100%;
+    height: 30px;
+    list-style: none;
 
     &:hover,
     &:focus {
@@ -75,18 +82,58 @@ const ListWrapper = styled.div`
     }
   }
 
+  .list-virtual-wrapper {
+    overflow: scroll;
+    max-height: 242px;
+    width: 100%;
+    position: relative;
+    margin-top: 2px;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    line-height: 1;
+
+    .list {
+      width: 100%;
+    }
+    .list-item {
+      position: absolute;
+    }
+  }
+
   svg {
     line-height: 1;
   }
 `;
+
+const SelectorWrapper = styled.div`
+  display: flex;
+  .selected-items {
+    margin-right: 8px;
+  }
+`;
+
 const renderSelector = (list) => {
-  return <div>{list[0].value}</div>;
+  return (
+    <SelectorWrapper>
+      <span className="selected-items">{list[0].value}</span>
+      <span>{list.length} selected</span>
+    </SelectorWrapper>
+  );
 };
 
 const isArrayItemExists = (list) => {
   if (!Array.isArray(list)) return false;
   if (list.length < 1) return false;
   return true;
+};
+
+const getFirstItemIdx = (scrollHeight) => {
+  if (scrollHeight < 1) return 0;
+
+  let startIdx = 0;
+  startIdx = Math.round(scrollHeight / ITEM_HEIGHT);
+
+  return startIdx;
 };
 
 const SimpleListPresenter = ({
@@ -102,40 +149,69 @@ const SimpleListPresenter = ({
   setIsAllChecked,
   isIndeterminate,
 }) => {
-  console.log("SimpleListPresenter", { isAllChecked, isListVisible });
+  const refVirtualScroll = useRef(null);
+  const [scrollHeight, setScrollHeight] = useState(0);
+
   useEffect(() => {
-    console.log("Presenter", { selectedList });
-  }, [selectedList]);
+    const handleScroll = (e) => {
+      setScrollHeight(e.target.scrollTop);
+    };
+    const element = refVirtualScroll.current;
+    if (element) {
+      element.addEventListener("scroll", handleScroll);
+    }
 
-  const renderItemList = useCallback(() => {
-    return itemList.map((item) => {
-      return (
-        <li key={item.key} className="list-item">
-          <Checkbox
-            checked={item.checked}
-            onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
-          >
-            {item.value}
-          </Checkbox>
-        </li>
-      );
-    });
-  }, [itemList, onChangeCheckboxItem]);
+    return () => {
+      if (element) {
+        element.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [isListVisible]);
 
-  const renderFilteredItemList = useCallback(() => {
-    return filteredList.map((item) => {
-      return (
-        <li key={item.key} className="list-item">
-          <Checkbox
-            checked={item.checked}
-            onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
-          >
-            {item.value}
-          </Checkbox>
-        </li>
-      );
-    });
-  }, [filteredList, onChangeCheckboxItem]);
+  const renderItemList = useCallback(
+    (itemList) => {
+      let visibleIndex = getFirstItemIdx(scrollHeight);
+      let startIdx = visibleIndex - 3 < 0 ? 0 : visibleIndex - 3;
+      let endIdx =
+        visibleIndex + MAX_ITEM_CNT > itemList.length
+          ? itemList.length - 1
+          : startIdx + MAX_ITEM_CNT;
+      const targetList = [];
+
+      for (let i = startIdx; i <= endIdx; i++) {
+        const element = itemList[i];
+        targetList.push({ ...element, height: i * ITEM_HEIGHT });
+      }
+
+      return targetList.map((item) => {
+        return (
+          <li key={item.key} className="list-item" style={{ top: `${item.height}px` }}>
+            <Checkbox
+              checked={item.checked}
+              onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
+            >
+              {item.value}
+            </Checkbox>
+          </li>
+        );
+      });
+    },
+    [onChangeCheckboxItem, scrollHeight]
+  );
+
+  const calcListHeight = useCallback(() => {
+    const topBottomBorder = 2;
+
+    let listHeight = 0;
+
+    if (filterTxt) {
+      listHeight = filteredList.length * ITEM_HEIGHT;
+    } else {
+      listHeight = itemList.length * ITEM_HEIGHT;
+    }
+
+    return listHeight + topBottomBorder;
+  }, [filterTxt, filteredList.length, itemList.length]);
 
   return (
     <ListWrapper className="list-wrapper" ref={refListEl}>
@@ -147,7 +223,7 @@ const SimpleListPresenter = ({
         </div>
         <div className="list-selector-allcheck">
           {isListVisible && (
-            <ul className="list">
+            <ul className="selector-list">
               <li className="list-item">
                 <Checkbox
                   checked={isAllChecked}
@@ -171,7 +247,11 @@ const SimpleListPresenter = ({
         </div>
       </div>
       {isListVisible && (
-        <ul className="list">{filterTxt ? renderFilteredItemList() : renderItemList()}</ul>
+        <div className="list-virtual-wrapper" ref={refVirtualScroll}>
+          <ul style={{ height: `${calcListHeight()}px` }} className="list">
+            {filterTxt ? renderItemList(filteredList) : renderItemList(itemList)}
+          </ul>
+        </div>
       )}
     </ListWrapper>
   );
