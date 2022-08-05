@@ -16,9 +16,6 @@ import SimpleListPresenter from "./SimpleList.presenter";
     - Think about reducing rendering when filter changes...
       -> Should I split the component?
   Today: 
-  Virtual scrolloing
-  - change css style
-  - add scroll event
 */
 
 const SimpleList = ({ itemList, onItemSelected }) => {
