@@ -24,7 +24,6 @@ import SimpleListPresenter from "./SimpleList.presenter";
 const SimpleList = ({ itemList, onItemSelected }) => {
   const [_list, setList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
-  const [selectedList, setSelectedList] = useState([]);
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [isIndeterminate, setIsIndeterminate] = useState(false);
   const [isListVisible, setIsListVisible] = useState(false);
