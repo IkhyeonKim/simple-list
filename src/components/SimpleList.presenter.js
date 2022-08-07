@@ -16,9 +16,10 @@ The lightest blue: #e9fafd
 
 const ITEM_HEIGHT = 30;
 const MAX_ITEM_CNT = 12;
+const MAX_ITEM_CHAR_CNT = 13;
 
 const ListWrapper = styled.div`
-  width: 200px;
+  width: 205px;
   /* height: 30px; */
   display: flex;
   flex-direction: column;
@@ -107,16 +108,100 @@ const ListWrapper = styled.div`
 
 const SelectorWrapper = styled.div`
   display: flex;
+  align-items: center;
+  line-height: 1;
+
   .selected-items {
-    margin-right: 8px;
+    margin-right: 4px;
+    background-color: #e6e6e6;
+    padding: 2px 4px;
+  }
+
+  .selected-item-count {
+    background-color: #00b4d8;
+    color: white;
+    padding: 2px 4px;
+    font-weight: bold;
+
+    &.no-selected-item {
+      color: #bfbfbf;
+      background-color: white;
+    }
+  }
+
+  .no-items {
+    background-color: #00b4d8;
+    color: white;
+    padding: 2px 4px;
+    font-weight: bold;
   }
 `;
+
+const renderSelectorItems = (list) => {
+  let charCnt = 0;
+  const renderItems = [];
+  for (let i = 0; i < list.length; i++) {
+    if (list.length < 1) break;
+    const item = list[i];
+    charCnt += item.value.length;
+    if (charCnt < MAX_ITEM_CHAR_CNT) {
+      renderItems.push(
+        <span key={item.value} className="selected-items">
+          {item.value}
+        </span>
+      );
+    } else {
+      renderItems.push(
+        <span key={"dots"} className="selected-items">
+          ...
+        </span>
+      );
+      break;
+    }
+  }
+  return renderItems;
+};
 
 const renderSelector = (list) => {
   return (
     <SelectorWrapper>
-      <span className="selected-items">{list[0].value}</span>
-      <span>{list.length} selected</span>
+      {/* {(() => {
+      let charCnt = 0;
+      const renderItems = [];
+        for (let i = 0; i < list.length; i++) {
+          const item = list[i];
+          charCnt += item.value.length;
+          if (charCnt < MAX_ITEM_CHAR_CNT) {
+            renderItems.push(
+              <span key={item.value} className="selected-items">
+                {item.value}
+              </span>
+            );
+          } else {
+            renderItems.push(
+              <span key={"dots"} className="selected-items">
+                ...
+              </span>
+            );
+            break;
+          }
+        }
+        return renderItems;
+      })()} */}
+      {renderSelectorItems(list)}
+      {list.length === 0 ? (
+        <span className="selected-item-count no-selected-item">Select item</span>
+      ) : (
+        <span className="selected-item-count">{list.length}</span>
+      )}
+    </SelectorWrapper>
+  );
+};
+
+const renderNoDataSelector = () => {
+  return (
+    <SelectorWrapper>
+      <span className="no-items">NO DATA</span>
     </SelectorWrapper>
   );
 };
@@ -219,7 +304,8 @@ const SimpleListPresenter = ({
         <div
           className={`${isListVisible ? "list-selector list-selector-focused" : "list-selector"}`}
         >
-          {isArrayItemExists(selectedList) && renderSelector(selectedList)} <ArrowIcon />
+          {isArrayItemExists(itemList) ? renderSelector(selectedList) : renderNoDataSelector()}
+          <ArrowIcon />
         </div>
         <div className="list-selector-allcheck">
           {isListVisible && (
