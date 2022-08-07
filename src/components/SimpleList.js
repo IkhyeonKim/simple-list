@@ -16,8 +16,19 @@ import SimpleListPresenter from "./SimpleList.presenter";
     - Think about reducing rendering when filter changes...
       -> Should I split the component?
   Today: 
-  Add selector style
-  Take care of abnormal case for selector (... long str etc...)
+  Filtering logic
+  issue case 1: check status during filtering
+  - scenario: Click all check button -> input filter text -> click all check
+  - expected output: uncheck current filtered list items
+  - acutal output: check all of current filterd list items and uncheck checked items which wasn't filtered and all check status doesn't change
+  issue case 2: During filtering the all check button effects not only filtered list but also unfiltered list
+  - scenario: Click all check button -> input filter text -> Click all check button
+  - expected output: Uncheck only filtered list
+  - acutal output: Uncheck filtered list and unfiltered list as well
+  issue case 3: All check button status
+  - scenario: Click all check button -> input filter text -> click all check button -> delete filter text
+  - expected output: indetermined check status for the all check button
+  - actual output: unchecked status for the all check button
 */
 
 const SimpleList = ({ itemList, onItemSelected }) => {
