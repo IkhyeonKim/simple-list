@@ -1,3 +1,4 @@
+import differenceBy from "lodash.differenceby";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "./Clickoutside";
 import SimpleListPresenter from "./SimpleList.presenter";
@@ -40,11 +41,13 @@ const SimpleList = ({ itemList, onItemSelected }) => {
   const [filterTxt, setFilterTxt] = useState("");
   const refListEl = useRef();
   const refSelectedList = useRef([]);
+  const refFirstInit = useRef(true);
 
   useOnClickOutside(refListEl, () => setIsListVisible(false));
 
   useEffect(() => {
-    console.log("Initial Set Up");
+    // NOTE: Initial Set Up
+    console.log("initial");
     if (Array.isArray(itemList)) {
       const temp = itemList.map((item, index) => {
         let _item = undefined;
@@ -72,7 +75,12 @@ const SimpleList = ({ itemList, onItemSelected }) => {
     refSelectedList.current.push(item);
   }, []);
 
-  const removeFromSelectedList = useCallback((item) => {
+  const addItemsToSelectedList = useCallback((items) => {
+    // add items to itemList
+    // if it's not
+  }, []);
+
+  const removeItemFromSelectedList = useCallback((item) => {
     const _selectedList = refSelectedList.current.filter(
       (selectedItem) => selectedItem.key !== item.key
     );
@@ -81,6 +89,11 @@ const SimpleList = ({ itemList, onItemSelected }) => {
 
   const removeAllSelectedList = useCallback(() => {
     refSelectedList.current = [];
+  }, []);
+
+  const removeItemsFromSelectedList = useCallback((items) => {
+    const _selectedList = differenceBy(refSelectedList.current, items, "key");
+    refSelectedList.current = _selectedList;
   }, []);
 
   const returnSelectedList = useCallback(() => {
@@ -115,7 +128,7 @@ const SimpleList = ({ itemList, onItemSelected }) => {
         if (checked) {
           addToSelectedList(targetItem);
         } else {
-          removeFromSelectedList(targetItem);
+          removeItemFromSelectedList(targetItem);
         }
 
         // Check is Allcheck
@@ -133,36 +146,73 @@ const SimpleList = ({ itemList, onItemSelected }) => {
         returnSelectedList();
       }
     },
-    [_list, addToSelectedList, filterTxt, filteredList, removeFromSelectedList, returnSelectedList]
+    [
+      _list,
+      addToSelectedList,
+      filterTxt,
+      filteredList,
+      removeItemFromSelectedList,
+      returnSelectedList,
+    ]
   );
 
   const onChangeAllChecked = useCallback(
     (checked) => {
+      console.log("onChangeAllChecked", { filterTxt });
       setIsAllChecked(checked);
       setIsIndeterminate(false);
 
       let tempArr = [];
 
       if (filterTxt) {
+        const copiedList = [..._list];
         tempArr = filteredList.map((item) => {
+          const targetItem = { ...item, checked };
+          const target = copiedList.find((copiedItem) => copiedItem.key === targetItem.key);
+          if (target) {
+          }
           return { ...item, checked };
         });
         setFilteredList(tempArr);
+
+        // const temp = _list.map((item) => {
+        //   const targetItem = { ...item, checked };
+        //   if (targetItem.key === item.key) return targetItem;
+        //   return { ...item };
+        // });
+        // setList(temp);
       } else {
         tempArr = _list.map((item) => {
           return { ...item, checked };
         });
         setList(tempArr);
       }
-
+      console.log({ tempArr });
       if (checked) {
-        addAllSelectedList(tempArr);
+        if (filterTxt) {
+          addAllSelectedList(tempArr);
+        } else {
+          addAllSelectedList(tempArr);
+        }
       } else {
-        removeAllSelectedList();
+        if (filterTxt) {
+          // removeAllSelectedList();
+          removeItemsFromSelectedList(tempArr);
+        } else {
+          removeAllSelectedList();
+        }
       }
       returnSelectedList();
     },
-    [_list, addAllSelectedList, filterTxt, filteredList, removeAllSelectedList, returnSelectedList]
+    [
+      _list,
+      addAllSelectedList,
+      filterTxt,
+      filteredList,
+      removeAllSelectedList,
+      removeItemsFromSelectedList,
+      returnSelectedList,
+    ]
   );
 
   const onChangeFilter = useCallback(
@@ -205,6 +255,24 @@ const SimpleList = ({ itemList, onItemSelected }) => {
 
     return () => window.removeEventListener("click", onClick);
   }, []);
+
+  // NOTE: Change all check status when filter text has changed
+  useEffect(() => {
+    if (refFirstInit.current) {
+      refFirstInit.current = false;
+      return;
+    }
+
+    if (filterTxt === "") {
+      // determinate if there's a checked item in itemList
+      console.log("Hello ");
+      if (refSelectedList.current.length > 0) {
+        setIsIndeterminate(true);
+      }
+    } else {
+      // determinate if there's a checked item in filterList
+    }
+  }, [filterTxt]);
 
   return (
     <SimpleListPresenter
