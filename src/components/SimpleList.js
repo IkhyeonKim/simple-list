@@ -16,20 +16,6 @@ import SimpleListPresenter from "./SimpleList.presenter";
     - What if the item names are so long?
     - Think about reducing rendering when filter changes...
       -> Should I split the component?
-  Today: 
-  Filtering logic
-  issue case 1: check status during filtering
-  - scenario: Click all check button -> input filter text -> click all check
-  - expected output: uncheck current filtered list items
-  - acutal output: check all of current filterd list items and uncheck checked items which wasn't filtered and all check status doesn't change
-  issue case 2: During filtering the all check button effects not only filtered list but also unfiltered list
-  - scenario: Click all check button -> input filter text -> Click all check button
-  - expected output: Uncheck only filtered list
-  - acutal output: Uncheck filtered list and unfiltered list as well
-  issue case 3: All check button status
-  - scenario: Click all check button -> input filter text -> click all check button -> delete filter text
-  - expected output: indetermined check status for the all check button
-  - actual output: unchecked status for the all check button
 */
 
 const SimpleList = ({ itemList, onItemSelected }) => {
@@ -41,13 +27,11 @@ const SimpleList = ({ itemList, onItemSelected }) => {
   const [filterTxt, setFilterTxt] = useState("");
   const refListEl = useRef();
   const refSelectedList = useRef([]);
-  const refFirstInit = useRef(true);
 
   useOnClickOutside(refListEl, () => setIsListVisible(false));
 
   useEffect(() => {
     // NOTE: Initial Set Up
-    console.log("initial");
     if (Array.isArray(itemList)) {
       const temp = itemList.map((item, index) => {
         let _item = undefined;
@@ -75,11 +59,6 @@ const SimpleList = ({ itemList, onItemSelected }) => {
     refSelectedList.current.push(item);
   }, []);
 
-  const addItemsToSelectedList = useCallback((items) => {
-    // add items to itemList
-    // if it's not
-  }, []);
-
   const removeItemFromSelectedList = useCallback((item) => {
     const _selectedList = refSelectedList.current.filter(
       (selectedItem) => selectedItem.key !== item.key
@@ -103,7 +82,6 @@ const SimpleList = ({ itemList, onItemSelected }) => {
 
   const onChangeCheckboxItem = useCallback(
     ({ event, checkedItem }) => {
-      console.log("onChangeCheckboxItem");
       let checked = event.target.checked;
       console.log({ event, checkedItem, checked });
       let targetItem = _list.find((listItem) => listItem.key === checkedItem.key);
@@ -158,39 +136,44 @@ const SimpleList = ({ itemList, onItemSelected }) => {
 
   const onChangeAllChecked = useCallback(
     (checked) => {
-      console.log("onChangeAllChecked", { filterTxt });
       setIsAllChecked(checked);
       setIsIndeterminate(false);
 
+      const copiedSelectedList = [...refSelectedList.current];
+      const copiedList = [..._list];
       let tempArr = [];
 
       if (filterTxt) {
-        const copiedList = [..._list];
         tempArr = filteredList.map((item) => {
           const targetItem = { ...item, checked };
-          const target = copiedList.find((copiedItem) => copiedItem.key === targetItem.key);
-          if (target) {
+
+          const targetIndex = copiedSelectedList.findIndex((item) => item.key === targetItem.key);
+          const targetSelectedIndex = copiedList.findIndex((item) => item.key === targetItem.key);
+
+          if (targetIndex !== -1) {
+            copiedSelectedList[targetIndex] = { ...copiedSelectedList[targetIndex], checked };
+          } else {
+            copiedSelectedList.push({ ...targetItem });
+          }
+
+          if (targetSelectedIndex !== -1) {
+            copiedList[targetSelectedIndex] = { ...copiedList[targetSelectedIndex], checked };
           }
           return { ...item, checked };
         });
-        setFilteredList(tempArr);
 
-        // const temp = _list.map((item) => {
-        //   const targetItem = { ...item, checked };
-        //   if (targetItem.key === item.key) return targetItem;
-        //   return { ...item };
-        // });
-        // setList(temp);
+        setFilteredList(tempArr);
+        setList(copiedList);
       } else {
         tempArr = _list.map((item) => {
           return { ...item, checked };
         });
         setList(tempArr);
       }
-      console.log({ tempArr });
+
       if (checked) {
         if (filterTxt) {
-          addAllSelectedList(tempArr);
+          addAllSelectedList(copiedSelectedList);
         } else {
           addAllSelectedList(tempArr);
         }
@@ -220,12 +203,40 @@ const SimpleList = ({ itemList, onItemSelected }) => {
       console.log({ filterTextValue: value });
       setFilterTxt(value);
       if (value) {
-        const tempArr = _list.filter((item) =>
-          item.value.toLowerCase().includes(value.toLowerCase())
-        );
-        console.log({ tempArr });
+        let checkedCnt = 0;
+        const tempArr = _list.filter((item) => {
+          if (item.value.toLowerCase().includes(value.toLowerCase())) {
+            if (item.checked) checkedCnt++;
+            return true;
+          } else {
+            return false;
+          }
+        });
+
+        if (checkedCnt === 0) {
+          setIsAllChecked(false);
+          setIsIndeterminate(false);
+        } else if (checkedCnt === tempArr.length) {
+          setIsAllChecked(true);
+          setIsIndeterminate(false);
+        } else {
+          setIsAllChecked(false);
+          setIsIndeterminate(true);
+        }
+
         setFilteredList(tempArr);
       } else {
+        if (refSelectedList.current.length === 0) {
+          setIsAllChecked(false);
+          setIsIndeterminate(false);
+        } else if (refSelectedList.current.length === _list.length) {
+          setIsAllChecked(true);
+          setIsIndeterminate(false);
+        } else {
+          setIsAllChecked(false);
+          setIsIndeterminate(true);
+        }
+
         setFilteredList([]);
       }
     },
@@ -255,24 +266,6 @@ const SimpleList = ({ itemList, onItemSelected }) => {
 
     return () => window.removeEventListener("click", onClick);
   }, []);
-
-  // NOTE: Change all check status when filter text has changed
-  useEffect(() => {
-    if (refFirstInit.current) {
-      refFirstInit.current = false;
-      return;
-    }
-
-    if (filterTxt === "") {
-      // determinate if there's a checked item in itemList
-      console.log("Hello ");
-      if (refSelectedList.current.length > 0) {
-        setIsIndeterminate(true);
-      }
-    } else {
-      // determinate if there's a checked item in filterList
-    }
-  }, [filterTxt]);
 
   return (
     <SimpleListPresenter
