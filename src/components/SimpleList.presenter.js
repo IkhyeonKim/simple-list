@@ -19,6 +19,15 @@ const MAX_ITEM_CNT = 12;
 const MAX_ITEM_CHAR_CNT = 13;
 
 const ListWrapper = styled.div`
+  * {
+    box-sizing: border-box;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
   width: 205px;
   /* height: 30px; */
   display: flex;
@@ -332,13 +341,15 @@ const SimpleListPresenter = ({
           )}
         </div>
       </div>
-      {isListVisible && (
-        <div className="list-virtual-wrapper" ref={refVirtualScroll}>
-          <ul style={{ height: `${calcListHeight()}px` }} className="list">
-            {filterTxt ? renderItemList(filteredList) : renderItemList(itemList)}
-          </ul>
-        </div>
-      )}
+      <div
+        style={isListVisible ? {} : { display: "none" }}
+        className="list-virtual-wrapper"
+        ref={refVirtualScroll}
+      >
+        <ul style={{ height: `${calcListHeight()}px` }} className="list">
+          {filterTxt ? renderItemList(filteredList) : renderItemList(itemList)}
+        </ul>
+      </div>
     </ListWrapper>
   );
 };

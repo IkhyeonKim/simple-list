@@ -15,7 +15,7 @@ const makeDummyData = (cnt) => {
   return arr;
 };
 
-const myArr = makeDummyData(20);
+const myArr = makeDummyData(200);
 function App() {
   const [myList, setMyList] = useState([]);
   return (
