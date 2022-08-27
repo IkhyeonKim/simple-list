@@ -1,3 +1,3 @@
-import SimpleList from "./SimpleList";
+import SimpleList from "./SimpleList.js";
 
 export { SimpleList };
