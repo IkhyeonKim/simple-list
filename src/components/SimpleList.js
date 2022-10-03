@@ -18,7 +18,7 @@ import SimpleListPresenter from "./SimpleList.presenter";
       -> Should I split the component?
 */
 
-const SimpleList = ({ itemList, onItemSelected }) => {
+const SimpleList = ({ itemList, onItemSelected, size }) => {
   const [_list, setList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
   const [isAllChecked, setIsAllChecked] = useState(false);
@@ -280,6 +280,7 @@ const SimpleList = ({ itemList, onItemSelected }) => {
       setIsAllChecked={onChangeAllChecked}
       filteredList={filteredList}
       isIndeterminate={isIndeterminate}
+      size={size}
     />
   );
 };

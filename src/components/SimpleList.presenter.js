@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from "react";
 import { useState } from "react";
 import { useRef } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import ArrowIcon from "./ArrowIcon";
 import Checkbox from "./Checkbox";
 
@@ -14,9 +14,15 @@ ade8f4
 The lightest blue: #e9fafd
 */
 
+const SIZE_SMALL = "small";
+const SIZE_MEDIUM = "medium";
+const SIZE_LARGE = "large";
+const SIZE_FULL = "full";
+
 const ITEM_HEIGHT = 30;
 const MAX_ITEM_CNT = 12;
 const MAX_ITEM_CHAR_CNT = 13;
+const MEDIUM_MAX_ITEM_CHAR_CNT = 34;
 
 const ListWrapper = styled.div`
   * {
@@ -28,7 +34,30 @@ const ListWrapper = styled.div`
     padding: 0;
   }
 
-  width: 205px;
+  ${(props) => {
+    switch (props.size) {
+      case SIZE_SMALL:
+        return css`
+          width: 205px;
+        `;
+      case SIZE_MEDIUM:
+        return css`
+          width: 405px;
+        `;
+      case SIZE_LARGE:
+        return css`
+          width: 605px;
+        `;
+      case SIZE_FULL:
+        return css`
+          width: 100%;
+        `;
+      default:
+        return css`
+          width: 205px;
+        `;
+    }
+  }}
   /* height: 30px; */
   display: flex;
   flex-direction: column;
@@ -146,14 +175,26 @@ const SelectorWrapper = styled.div`
   }
 `;
 
-const renderSelectorItems = (list) => {
+const getCharCnt = (size) => {
+  switch (size) {
+    case SIZE_SMALL:
+      return MAX_ITEM_CHAR_CNT;
+    case SIZE_MEDIUM:
+      return MEDIUM_MAX_ITEM_CHAR_CNT;
+    default:
+      return MAX_ITEM_CHAR_CNT;
+  }
+};
+
+const renderSelectorItems = (list, size) => {
   let charCnt = 0;
+  let maxCharCnt = getCharCnt(size);
   const renderItems = [];
   for (let i = 0; i < list.length; i++) {
     if (list.length < 1) break;
     const item = list[i];
     charCnt += item.value.length;
-    if (charCnt < MAX_ITEM_CHAR_CNT) {
+    if (charCnt < maxCharCnt) {
       renderItems.push(
         <span key={item.value} className="selected-items">
           {item.value}
@@ -171,7 +212,7 @@ const renderSelectorItems = (list) => {
   return renderItems;
 };
 
-const renderSelector = (list) => {
+const renderSelector = (list, size) => {
   return (
     <SelectorWrapper>
       {/* {(() => {
@@ -197,7 +238,7 @@ const renderSelector = (list) => {
         }
         return renderItems;
       })()} */}
-      {renderSelectorItems(list)}
+      {renderSelectorItems(list, size)}
       {list.length === 0 ? (
         <span className="selected-item-count no-selected-item">Select item</span>
       ) : (
@@ -242,6 +283,7 @@ const SimpleListPresenter = ({
   isAllChecked,
   setIsAllChecked,
   isIndeterminate,
+  size,
 }) => {
   const refVirtualScroll = useRef(null);
   const [scrollHeight, setScrollHeight] = useState(0);
@@ -308,12 +350,14 @@ const SimpleListPresenter = ({
   }, [filterTxt, filteredList.length, itemList.length]);
 
   return (
-    <ListWrapper className="list-wrapper" ref={refListEl}>
+    <ListWrapper className="list-wrapper" size={size} ref={refListEl}>
       <div className="list-selector-wrapper">
         <div
           className={`${isListVisible ? "list-selector list-selector-focused" : "list-selector"}`}
         >
-          {isArrayItemExists(itemList) ? renderSelector(selectedList) : renderNoDataSelector()}
+          {isArrayItemExists(itemList)
+            ? renderSelector(selectedList, size)
+            : renderNoDataSelector()}
           <ArrowIcon />
         </div>
         <div className="list-selector-allcheck">
