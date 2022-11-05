@@ -21,7 +21,7 @@ import SimpleListPresenter from "./SimpleList.presenter";
 const SimpleList = ({ itemList, onItemSelected, size }) => {
   // const [_list, setList] = useState([]);
   const [_list, setList] = useState(new Map());
-  const [filteredList, setFilteredList] = useState([]);
+  const [filteredList, setFilteredList] = useState(new Map());
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [isIndeterminate, setIsIndeterminate] = useState(false);
   const [isListVisible, setIsListVisible] = useState(false);
@@ -62,7 +62,7 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
           _item.index = index;
         }
 
-        tempMap.set(_item.index, _item);
+        tempMap.set(_item.key, _item);
       });
 
       setList(tempMap);
@@ -72,10 +72,10 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
 
   /**
    * Add all items to refSelectedList
-   * @param {  } item
+   * @param { Map } items
    */
   const addAllSelectedList = useCallback((items) => {
-    refSelectedList.current = [...items];
+    refSelectedList.current = new Map([...items]);
   }, []);
 
   /**
@@ -84,7 +84,7 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
    */
   const addToSelectedList = useCallback((item) => {
     // refSelectedList.current.push(item);
-    refSelectedList.current.set(item.index, item);
+    refSelectedList.current.set(item.key, item);
   }, []);
 
   const removeItemFromSelectedList = useCallback((item) => {
@@ -93,7 +93,7 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
     // );
     // refSelectedList.current = _selectedList;
 
-    refSelectedList.current.delete(item.index);
+    refSelectedList.current.delete(item.key);
   }, []);
 
   const removeAllSelectedList = useCallback(() => {
@@ -123,10 +123,11 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
       let checked = event.target.checked;
       console.log({ event, checkedItem, checked });
       // let targetItem = _list.find((listItem) => listItem.key === checkedItem.key);
-      let targetItem = _list.get(checkedItem.index);
+      let targetItem = undefined;
 
-      if (targetItem) {
-        targetItem = { ...targetItem, checked };
+      if (true) {
+        targetItem = { ..._list.get(checkedItem.key), checked };
+        // targetItem = { ...targetItem, checked };
         // const temp = _list.map((item) => {
         //   if (targetItem.key === item.key) return targetItem;
         //   return { ...item };
@@ -134,16 +135,20 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
         // setList(temp);
 
         const tempMap = new Map([..._list]);
-        tempMap.set(targetItem.index, { ...targetItem });
+        tempMap.set(targetItem.key, { ...targetItem });
         setList(tempMap);
 
         //TODO: Is this the best..?
         if (filterTxt) {
-          const temp = filteredList.map((item) => {
-            if (targetItem.key === item.key) return targetItem;
-            return { ...item };
-          });
-          setFilteredList(temp);
+          targetItem = { ...filteredList.get(checkedItem.key), checked };
+          // const temp = filteredList.map((item) => {
+          //   if (targetItem.key === item.key) return targetItem;
+          //   return { ...item };
+          // });
+          // setFilteredList(temp);
+          const tempFilterMap = new Map([...filteredList]);
+          tempFilterMap.set(targetItem.key, { ...targetItem });
+          setFilteredList(tempFilterMap);
         }
 
         if (checked) {
@@ -182,9 +187,9 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
       setIsAllChecked(checked);
       setIsIndeterminate(false);
 
-      const copiedSelectedList = [...refSelectedList.current];
-      const copiedList = [..._list];
-      let tempArr = [];
+      const copiedSelectedList = new Map([...refSelectedList.current]);
+      const copiedList = new Map([..._list]);
+      let tempArr = new Map();
 
       if (filterTxt) {
         tempArr = filteredList.map((item) => {
@@ -207,10 +212,16 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
 
         setFilteredList(tempArr);
         setList(copiedList);
+
+        //TODO: select only filtered data
       } else {
-        tempArr = _list.map((item) => {
-          return { ...item, checked };
-        });
+        // tempArr = _list.map((item) => {
+        //   return { ...item, checked };
+        // });
+        tempArr = new Map([..._list]);
+        for (const [k, v] of tempArr) {
+          tempArr.set(k, { ...v, checked });
+        }
         setList(tempArr);
       }
 
@@ -247,27 +258,48 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
       setFilterTxt(value);
       if (value) {
         let checkedCnt = 0;
-        const tempArr = _list.filter((item) => {
-          if (item.value.toLowerCase().includes(value.toLowerCase())) {
-            if (item.checked) checkedCnt++;
-            return true;
-          } else {
-            return false;
+        // const tempArr = _list.filter((item) => {
+        //   if (item.value.toLowerCase().includes(value.toLowerCase())) {
+        //     if (item.checked) checkedCnt++;
+        //     return true;
+        //   } else {
+        //     return false;
+        //   }
+        // });
+
+        // const tempMap = new Map(
+        //   [..._list].filter(([k, v]) => {
+        //     if (v.value.toLowerCase().includes(value.toLowerCase())) {
+        //       if (v.checked) checkedCnt++;
+        //       return true;
+        //     } else {
+        //       return false;
+        //     }
+        //   })
+        // );
+
+        const tempMap = new Map();
+
+        let index = 0;
+        for (const [, v] of _list) {
+          if (v.value.toLowerCase().includes(value.toLowerCase())) {
+            if (v.checked) checkedCnt++;
+            tempMap.set(index++, { ...v, index });
           }
-        });
+        }
 
         if (checkedCnt === 0) {
           setIsAllChecked(false);
           setIsIndeterminate(false);
-        } else if (checkedCnt === tempArr.length) {
+        } else if (checkedCnt === tempMap.size) {
           setIsAllChecked(true);
           setIsIndeterminate(false);
         } else {
           setIsAllChecked(false);
           setIsIndeterminate(true);
         }
-
-        setFilteredList(tempArr);
+        console.log({ tempMap });
+        setFilteredList(tempMap);
       } else {
         if (refSelectedList.current.length === 0) {
           setIsAllChecked(false);

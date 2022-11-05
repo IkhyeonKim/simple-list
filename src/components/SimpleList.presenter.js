@@ -311,10 +311,13 @@ const SimpleListPresenter = ({
       let endIdx =
         visibleIndex + MAX_ITEM_CNT > itemList.size ? itemList.size - 1 : startIdx + MAX_ITEM_CNT;
       const targetList = [];
+
+      // TODO: find a way to render through Map
+      const tempArray = [...itemList].map((item) => item[1]);
       for (let i = startIdx; i <= endIdx; i++) {
         // const element = itemList[i];
         // targetList.push({ ...element, height: i * ITEM_HEIGHT });
-        const element = itemList.get(i);
+        const element = tempArray[i];
         targetList.push({ ...element, height: i * ITEM_HEIGHT });
       }
 
@@ -340,13 +343,13 @@ const SimpleListPresenter = ({
     let listHeight = 0;
 
     if (filterTxt) {
-      listHeight = filteredList.length * ITEM_HEIGHT;
+      listHeight = filteredList.size * ITEM_HEIGHT;
     } else {
       listHeight = itemList.size * ITEM_HEIGHT;
     }
 
     return listHeight + topBottomBorder;
-  }, [filterTxt, filteredList.length, itemList.size]);
+  }, [filterTxt, filteredList.size, itemList.size]);
 
   return (
     <ListWrapper className="list-wrapper" size={size} ref={refListEl}>
