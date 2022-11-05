@@ -122,7 +122,6 @@ const ListWrapper = styled.div`
   }
 
   .list-virtual-wrapper {
-    overflow: scroll;
     max-height: 242px;
     width: 100%;
     position: relative;
@@ -130,6 +129,7 @@ const ListWrapper = styled.div`
     border: 1px solid #d9d9d9;
     border-radius: 2px;
     line-height: 1;
+    overflow: auto;
 
     .list {
       width: 100%;
@@ -256,9 +256,9 @@ const renderNoDataSelector = () => {
   );
 };
 
-const isArrayItemExists = (list) => {
-  if (!Array.isArray(list)) return false;
-  if (list.length < 1) return false;
+const isItemExists = (list) => {
+  if (!list) return false;
+  if (list.size < 1) return false;
   return true;
 };
 
@@ -309,13 +309,12 @@ const SimpleListPresenter = ({
       let visibleIndex = getFirstItemIdx(scrollHeight);
       let startIdx = visibleIndex - 3 < 0 ? 0 : visibleIndex - 3;
       let endIdx =
-        visibleIndex + MAX_ITEM_CNT > itemList.length
-          ? itemList.length - 1
-          : startIdx + MAX_ITEM_CNT;
+        visibleIndex + MAX_ITEM_CNT > itemList.size ? itemList.size - 1 : startIdx + MAX_ITEM_CNT;
       const targetList = [];
-
       for (let i = startIdx; i <= endIdx; i++) {
-        const element = itemList[i];
+        // const element = itemList[i];
+        // targetList.push({ ...element, height: i * ITEM_HEIGHT });
+        const element = itemList.get(i);
         targetList.push({ ...element, height: i * ITEM_HEIGHT });
       }
 
@@ -343,11 +342,11 @@ const SimpleListPresenter = ({
     if (filterTxt) {
       listHeight = filteredList.length * ITEM_HEIGHT;
     } else {
-      listHeight = itemList.length * ITEM_HEIGHT;
+      listHeight = itemList.size * ITEM_HEIGHT;
     }
 
     return listHeight + topBottomBorder;
-  }, [filterTxt, filteredList.length, itemList.length]);
+  }, [filterTxt, filteredList.length, itemList.size]);
 
   return (
     <ListWrapper className="list-wrapper" size={size} ref={refListEl}>
@@ -355,15 +354,13 @@ const SimpleListPresenter = ({
         <div
           className={`${isListVisible ? "list-selector list-selector-focused" : "list-selector"}`}
         >
-          {isArrayItemExists(itemList)
-            ? renderSelector(selectedList, size)
-            : renderNoDataSelector()}
+          {isItemExists(itemList) ? renderSelector(selectedList, size) : renderNoDataSelector()}
           <ArrowIcon />
         </div>
         <div className="list-selector-allcheck">
           {isListVisible && (
             <ul className="selector-list">
-              <li className="list-item">
+              <li key={"AllCheck"} className="list-item">
                 <Checkbox
                   checked={isAllChecked}
                   indeterminate={isIndeterminate}

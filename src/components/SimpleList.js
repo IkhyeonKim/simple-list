@@ -19,55 +19,85 @@ import SimpleListPresenter from "./SimpleList.presenter";
 */
 
 const SimpleList = ({ itemList, onItemSelected, size }) => {
-  const [_list, setList] = useState([]);
+  // const [_list, setList] = useState([]);
+  const [_list, setList] = useState(new Map());
   const [filteredList, setFilteredList] = useState([]);
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [isIndeterminate, setIsIndeterminate] = useState(false);
   const [isListVisible, setIsListVisible] = useState(false);
   const [filterTxt, setFilterTxt] = useState("");
   const refListEl = useRef();
-  const refSelectedList = useRef([]);
+  const refSelectedList = useRef(new Map());
 
   useOnClickOutside(refListEl, () => setIsListVisible(false));
 
   useEffect(() => {
     // NOTE: Initial Set Up
     if (Array.isArray(itemList)) {
-      const temp = itemList.map((item, index) => {
-        let _item = undefined;
+      // const temp = itemList.map((item, index) => {
+      //   let _item = undefined;
+      //   if (typeof item === "object") {
+      //     _item = {
+      //       key: item.key || `${item.value}_${index}`,
+      //       value: item.value,
+      //       index,
+      //       checked: false,
+      //     };
+      //   } else {
+      //     _item = { key: `${item}_${index}`, value: item, index, checked: false };
+      //   }
+      //   return _item;
+      // });
+
+      const tempMap = new Map();
+      itemList.forEach((item, index) => {
+        let _item = { key: undefined, value: undefined, index: undefined, checked: false };
         if (typeof item === "object") {
-          _item = {
-            key: item.key || `${item.value}_${index}`,
-            value: item.value,
-            index,
-            checked: false,
-          };
+          _item.key = item.key || `${item.value}_${index}`;
+          _item.value = item.value;
+          _item.index = index;
         } else {
-          _item = { key: `${item}_${index}`, value: item, index, checked: false };
+          _item.key = `${item}_${index}`;
+          _item.value = item;
+          _item.index = index;
         }
-        return _item;
+
+        tempMap.set(_item.index, _item);
       });
-      setList([...temp]);
+
+      setList(tempMap);
+      // setList([...temp]);
     }
   }, [itemList]);
 
+  /**
+   * Add all items to refSelectedList
+   * @param {  } item
+   */
   const addAllSelectedList = useCallback((items) => {
     refSelectedList.current = [...items];
   }, []);
 
+  /**
+   * Add a single item to refSelectedList
+   * @param { Object } item
+   */
   const addToSelectedList = useCallback((item) => {
-    refSelectedList.current.push(item);
+    // refSelectedList.current.push(item);
+    refSelectedList.current.set(item.index, item);
   }, []);
 
   const removeItemFromSelectedList = useCallback((item) => {
-    const _selectedList = refSelectedList.current.filter(
-      (selectedItem) => selectedItem.key !== item.key
-    );
-    refSelectedList.current = _selectedList;
+    // const _selectedList = refSelectedList.current.filter(
+    //   (selectedItem) => selectedItem.key !== item.key
+    // );
+    // refSelectedList.current = _selectedList;
+
+    refSelectedList.current.delete(item.index);
   }, []);
 
   const removeAllSelectedList = useCallback(() => {
-    refSelectedList.current = [];
+    refSelectedList.current = new Map();
   }, []);
 
   const removeItemsFromSelectedList = useCallback((items) => {
@@ -77,22 +107,35 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
 
   const returnSelectedList = useCallback(() => {
     console.log("returnSelectedList", refSelectedList.current);
-    onItemSelected([...refSelectedList.current]);
+    // onItemSelected([...refSelectedList.current]);
+    const temp = [];
+    for (const [, v] of refSelectedList.current) {
+      temp.push({
+        value: v.value,
+        key: v.key,
+      });
+    }
+    onItemSelected(temp);
   }, [onItemSelected]);
 
   const onChangeCheckboxItem = useCallback(
     ({ event, checkedItem }) => {
       let checked = event.target.checked;
       console.log({ event, checkedItem, checked });
-      let targetItem = _list.find((listItem) => listItem.key === checkedItem.key);
+      // let targetItem = _list.find((listItem) => listItem.key === checkedItem.key);
+      let targetItem = _list.get(checkedItem.index);
 
       if (targetItem) {
         targetItem = { ...targetItem, checked };
-        const temp = _list.map((item) => {
-          if (targetItem.key === item.key) return targetItem;
-          return { ...item };
-        });
-        setList(temp);
+        // const temp = _list.map((item) => {
+        //   if (targetItem.key === item.key) return targetItem;
+        //   return { ...item };
+        // });
+        // setList(temp);
+
+        const tempMap = new Map([..._list]);
+        tempMap.set(targetItem.index, { ...targetItem });
+        setList(tempMap);
 
         //TODO: Is this the best..?
         if (filterTxt) {
@@ -110,10 +153,10 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
         }
 
         // Check is Allcheck
-        if (refSelectedList.current.length === 0) {
+        if (refSelectedList.current.size === 0) {
           setIsAllChecked(false);
           setIsIndeterminate(false);
-        } else if (refSelectedList.current.length === _list.length) {
+        } else if (refSelectedList.current.size === _list.size) {
           setIsAllChecked(true);
           setIsIndeterminate(false);
         } else {
