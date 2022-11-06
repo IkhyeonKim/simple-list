@@ -144,7 +144,7 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
           const targetItem = { ...item, checked };
 
           const targetIndex = copiedSelectedList.findIndex((item) => item.key === targetItem.key);
-          const targetSelectedIndex = copiedList.findIndex((item) => item.key === targetItem.key);
+          const targetSelectedIndex = refList.current.get(item.key).index;
 
           if (targetIndex !== -1) {
             copiedSelectedList[targetIndex] = { ...copiedSelectedList[targetIndex], checked };
@@ -155,6 +155,7 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
           if (targetSelectedIndex !== -1) {
             copiedList[targetSelectedIndex] = { ...copiedList[targetSelectedIndex], checked };
           }
+          refFilterList.current.set(item.key, { ...item, checked });
           return { ...item, checked };
         });
 
