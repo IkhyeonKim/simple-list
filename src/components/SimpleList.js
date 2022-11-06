@@ -5,17 +5,9 @@ import SimpleListPresenter from "./SimpleList.presenter";
 
 /*
   TODO: 
-  1. Basic style
-    - visible
-    - selector area count
-    - selector area item names
-  2. Basic logic
-
-  3. Issues
+  Issues
     - Can't open on Safari broswer
     - What if the item names are so long?
-    - Think about reducing rendering when filter changes...
-      -> Should I split the component?
 */
 
 const SimpleList = ({ itemList, onItemSelected, size }) => {
@@ -27,27 +19,31 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
   const [filterTxt, setFilterTxt] = useState("");
   const refListEl = useRef();
   const refSelectedList = useRef([]);
+  const refList = useRef(new Map());
+  const refFilterList = useRef(new Map());
 
   useOnClickOutside(refListEl, () => setIsListVisible(false));
 
   useEffect(() => {
     // NOTE: Initial Set Up
     if (Array.isArray(itemList)) {
+      const tempMap = new Map();
       const temp = itemList.map((item, index) => {
-        let _item = undefined;
+        let _item = { key: undefined, value: undefined, index: undefined, checked: false };
         if (typeof item === "object") {
-          _item = {
-            key: item.key || `${item.value}_${index}`,
-            value: item.value,
-            index,
-            checked: false,
-          };
+          _item.key = item.key || `${item.value}_${index}`;
+          _item.value = item.value;
+          _item.index = index;
         } else {
-          _item = { key: `${item}_${index}`, value: item, index, checked: false };
+          _item.key = `${item}_${index}`;
+          _item.value = item;
+          _item.index = index;
         }
+        tempMap.set(_item.key, { ..._item });
         return _item;
       });
       setList([...temp]);
+      refList.current = tempMap;
     }
   }, [itemList]);
 
@@ -83,46 +79,46 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
   const onChangeCheckboxItem = useCallback(
     ({ event, checkedItem }) => {
       let checked = event.target.checked;
-      console.log({ event, checkedItem, checked });
-      let targetItem = _list.find((listItem) => listItem.key === checkedItem.key);
-
-      if (targetItem) {
-        targetItem = { ...targetItem, checked };
-        const temp = _list.map((item) => {
-          if (targetItem.key === item.key) return targetItem;
-          return { ...item };
-        });
+      let targetItem = undefined;
+      if (filterTxt) {
+        targetItem = { ...refFilterList.current.get(checkedItem.key), checked };
+        const temp = [
+          ...filteredList.slice(0, targetItem.index),
+          targetItem,
+          ...filteredList.slice(targetItem.index + 1),
+        ];
+        setFilteredList(temp);
+        refFilterList.current.set(targetItem.key, { ...targetItem });
+      } else {
+        targetItem = { ...refList.current.get(checkedItem.key), checked };
+        const temp = [
+          ..._list.slice(0, targetItem.index),
+          targetItem,
+          ..._list.slice(targetItem.index + 1),
+        ];
         setList(temp);
-
-        //TODO: Is this the best..?
-        if (filterTxt) {
-          const temp = filteredList.map((item) => {
-            if (targetItem.key === item.key) return targetItem;
-            return { ...item };
-          });
-          setFilteredList(temp);
-        }
-
-        if (checked) {
-          addToSelectedList(targetItem);
-        } else {
-          removeItemFromSelectedList(targetItem);
-        }
-
-        // Check is Allcheck
-        if (refSelectedList.current.length === 0) {
-          setIsAllChecked(false);
-          setIsIndeterminate(false);
-        } else if (refSelectedList.current.length === _list.length) {
-          setIsAllChecked(true);
-          setIsIndeterminate(false);
-        } else {
-          setIsAllChecked(false);
-          setIsIndeterminate(true);
-        }
-
-        returnSelectedList();
+        refList.current.set(targetItem.key, { ...targetItem });
       }
+
+      if (checked) {
+        addToSelectedList(targetItem);
+      } else {
+        removeItemFromSelectedList(targetItem);
+      }
+
+      // Check is Allcheck
+      if (refSelectedList.current.length === 0) {
+        setIsAllChecked(false);
+        setIsIndeterminate(false);
+      } else if (refSelectedList.current.length === _list.length) {
+        setIsAllChecked(true);
+        setIsIndeterminate(false);
+      } else {
+        setIsAllChecked(false);
+        setIsIndeterminate(true);
+      }
+
+      returnSelectedList();
     },
     [
       _list,
@@ -166,6 +162,7 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
         setList(copiedList);
       } else {
         tempArr = _list.map((item) => {
+          refList.current.set(item.key, { ...item, checked });
           return { ...item, checked };
         });
         setList(tempArr);
@@ -200,13 +197,15 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
 
   const onChangeFilter = useCallback(
     (value) => {
-      console.log({ filterTextValue: value });
       setFilterTxt(value);
       if (value) {
         let checkedCnt = 0;
+        let itemCnt = 0;
+        const tempMap = new Map();
         const tempArr = _list.filter((item) => {
           if (item.value.toLowerCase().includes(value.toLowerCase())) {
             if (item.checked) checkedCnt++;
+            tempMap.set(item.key, { ...item, index: itemCnt++ });
             return true;
           } else {
             return false;
@@ -225,6 +224,7 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
         }
 
         setFilteredList(tempArr);
+        refFilterList.current = tempMap;
       } else {
         if (refSelectedList.current.length === 0) {
           setIsAllChecked(false);

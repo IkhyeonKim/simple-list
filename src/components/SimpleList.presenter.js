@@ -130,6 +130,7 @@ const ListWrapper = styled.div`
     border: 1px solid #d9d9d9;
     border-radius: 2px;
     line-height: 1;
+    overflow: auto;
 
     .list {
       width: 100%;

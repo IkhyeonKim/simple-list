@@ -7,7 +7,7 @@ const makeDummyData = (cnt) => {
   for (let i = 0; i < cnt; i++) {
     const value = (Math.random() + 1).toString(36);
     const element = {
-      key: i + 1,
+      key: `item name_${i + 1}`,
       value: `Very looOOoOoooong item name_${i + 1}`,
     };
     arr.push(element);
