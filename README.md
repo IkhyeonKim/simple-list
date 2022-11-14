@@ -2,6 +2,8 @@
 
 This is a simple filter list with virtual scrolling
 
+- [Github](https://github.com/IkhyeonKim/simple-list)
+
 ## How to use
 
 ```Javascript
@@ -26,10 +28,11 @@ function App() {
 ## API
 
 ### props
-|Property|Description|Type|Default|     
-|----|-----|-------|-------|    
-|size|Set select size|`small` `medium` `large`|`small`
-|itemList|A list that you'd like to render|array|[]
-|onItemSelected|Returns currently selected items|function|
 
-### 
+| Property       | Description                      | Type                     | Default |
+| -------------- | -------------------------------- | ------------------------ | ------- |
+| size           | Set select size                  | `small` `medium` `large` | `small` |
+| itemList       | A list that you'd like to render | array                    | []      |
+| onItemSelected | Returns currently selected items | function                 |
+
+###
