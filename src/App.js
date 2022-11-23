@@ -8,7 +8,7 @@ const makeDummyData = (cnt) => {
     const value = (Math.random() + 1).toString(36);
     const element = {
       key: `item name_${i + 1}`,
-      value: `Very looOOoOoooong item name_${i + 1}`,
+      value: `Item name_${i + 1}`,
     };
     arr.push(element);
   }
@@ -20,7 +20,7 @@ function App() {
   const [myList, setMyList] = useState([]);
   return (
     <div style={{ padding: "1rem" }}>
-      <SimpleList size={"medium"} itemList={myArr} onItemSelected={(list) => setMyList(list)} />
+      <SimpleList size={"full"} itemList={myArr} onItemSelected={(list) => setMyList(list)} />
       <ul>
         {myList.map((item) => (
           <li key={item.key}>{item.value}</li>
