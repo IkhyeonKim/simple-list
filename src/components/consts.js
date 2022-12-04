@@ -11,3 +11,5 @@ export const MEDIUM_MAX_ITEM_CHAR_CNT = 34;
 export const LARGE_MAX_ITEM_CHAR_CNT = 55;
 export const ARROW_WIDTH = 12;
 export const TEXT_OVERFLOW = 20;
+
+export const CHARACTER_WIDTH = 10;

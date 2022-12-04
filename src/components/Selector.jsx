@@ -12,6 +12,7 @@ import {
   SIZE_MEDIUM,
   SIZE_SMALL,
   TEXT_OVERFLOW,
+  CHARACTER_WIDTH,
 } from "./consts";
 
 const SelectorWrapper = styled.div`
@@ -24,6 +25,7 @@ const SelectorWrapper = styled.div`
     margin-right: 4px;
     background-color: #e6e6e6;
     padding: 2px 4px;
+    text-align: center;
 
     &.text-overflow {
       width: 20px;
@@ -62,7 +64,7 @@ const getCharCnt = (size, width) => {
   if (size === SIZE_FULL) {
     if (width > small && width < medium) {
       let _width = width - ARROW_WIDTH - TEXT_OVERFLOW;
-      let cnt = Math.round(_width / 11);
+      let cnt = Math.round(_width / CHARACTER_WIDTH);
       return cnt;
     }
     if (width > medium && width < large) return 55;
@@ -77,11 +79,17 @@ const renderSelectorItems = (list, size, listWidth) => {
   const renderItems = [];
   for (let i = 0; i < list.length; i++) {
     if (list.length < 1) break;
+
     const item = list[i];
     charCnt += item.value.length;
+
     if (charCnt < maxCharCnt) {
       renderItems.push(
-        <span key={item.value} className="selected-items">
+        <span
+          key={item.value}
+          style={{ width: `${item.value.length * CHARACTER_WIDTH - 8}px` }}
+          className="selected-items"
+        >
           {item.value}
         </span>
       );
