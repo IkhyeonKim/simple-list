@@ -102,7 +102,9 @@ const renderSelector = (list, size, listWidth) => {
     <SelectorWrapper>
       {renderSelectorItems(list, size, listWidth)}
       {list.length === 0 ? (
-        <span className="selected-item-count no-selected-item">Select item</span>
+        <span className="selected-item-count no-selected-item">
+          Select item
+        </span>
       ) : (
         <span className="selected-item-count">{list.length}</span>
       )}
@@ -134,7 +136,9 @@ const Selector = ({ isListVisible, itemList, selectedList, size }) => {
   return (
     <div
       id="list-selector"
-      className={`${isListVisible ? "list-selector list-selector-focused" : "list-selector"}`}
+      className={`${
+        isListVisible ? "list-selector list-selector-focused" : "list-selector"
+      }`}
     >
       {isArrayItemExists(itemList)
         ? renderSelector(selectedList, size, listWidth)

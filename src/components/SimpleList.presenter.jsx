@@ -202,10 +202,16 @@ const SimpleListPresenter = ({
 
       return targetList.map((item) => {
         return (
-          <li key={item.key} className="list-item" style={{ top: `${item.height}px` }}>
+          <li
+            key={item.key}
+            className="list-item"
+            style={{ top: `${item.height}px` }}
+          >
             <Checkbox
               checked={item.checked}
-              onChange={(event) => onChangeCheckboxItem({ event, checkedItem: item })}
+              onChange={(event) =>
+                onChangeCheckboxItem({ event, checkedItem: item })
+              }
             >
               {item.value}
             </Checkbox>
@@ -229,8 +235,6 @@ const SimpleListPresenter = ({
 
     return listHeight + topBottomBorder;
   }, [filterTxt, filteredList.length, itemList.length]);
-
-  console.log({ filteredList, itemList });
 
   return (
     <ListWrapper className="list-wrapper" size={size} ref={refListEl}>

@@ -93,7 +93,9 @@ const Checkbox = ({ onChange, checked, children, indeterminate }) => {
         }}
       />
       <span
-        className={`checkbox-inner ${indeterminate ? "indeterminate" : checked ? "checked" : ""}`}
+        className={`checkbox-inner ${
+          indeterminate ? "indeterminate" : checked ? "checked" : ""
+        }`}
       ></span>
       <span>{children}</span>
     </CheckboxStyle>

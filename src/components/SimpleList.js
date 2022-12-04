@@ -29,7 +29,12 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
     if (Array.isArray(itemList)) {
       const tempMap = new Map();
       const temp = itemList.map((item, index) => {
-        let _item = { key: undefined, value: undefined, index: undefined, checked: false };
+        let _item = {
+          key: undefined,
+          value: undefined,
+          index: undefined,
+          checked: false,
+        };
         if (typeof item === "object") {
           _item.key = item.key || `${item.value}_${index}`;
           _item.value = item.value;
@@ -143,17 +148,25 @@ const SimpleList = ({ itemList, onItemSelected, size }) => {
         tempArr = filteredList.map((item) => {
           const targetItem = { ...item, checked };
 
-          const targetIndex = copiedSelectedList.findIndex((item) => item.key === targetItem.key);
+          const targetIndex = copiedSelectedList.findIndex(
+            (item) => item.key === targetItem.key
+          );
           const targetSelectedIndex = refList.current.get(item.key).index;
 
           if (targetIndex !== -1) {
-            copiedSelectedList[targetIndex] = { ...copiedSelectedList[targetIndex], checked };
+            copiedSelectedList[targetIndex] = {
+              ...copiedSelectedList[targetIndex],
+              checked,
+            };
           } else {
             copiedSelectedList.push({ ...targetItem });
           }
 
           if (targetSelectedIndex !== -1) {
-            copiedList[targetSelectedIndex] = { ...copiedList[targetSelectedIndex], checked };
+            copiedList[targetSelectedIndex] = {
+              ...copiedList[targetSelectedIndex],
+              checked,
+            };
           }
           refFilterList.current.set(item.key, { ...item, checked });
           return { ...item, checked };
