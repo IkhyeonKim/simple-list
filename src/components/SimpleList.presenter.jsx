@@ -32,6 +32,8 @@ const ListWrapper = styled.div`
     padding: 0;
   }
 
+  max-width: 605px;
+
   ${(props) => {
     switch (props.size) {
       case SIZE_SMALL:
